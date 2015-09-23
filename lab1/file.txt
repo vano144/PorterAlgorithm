@@ -1,0 +1,72 @@
+#include <iostream>
+#include <stdio.h>
+#include "porter.h"
+#include <vector>
+#include <regex>
+using namespace std;
+
+struct frequency {
+    int repeat;
+    string word;
+};
+
+
+regex f(",|\\.|!|\\?$");
+
+int main()
+{
+    //vector<frequency>* store=new vector<frequency>();
+    vector<frequency> store;
+    char buffer[20];
+    string wordFIle;
+    FILE *file;
+    file = fopen("/1", "r");
+    if (file==NULL) {
+        cout<<"trouble"<<endl;
+        return 0;
+    }
+    int i = 0;
+    bool added=false;
+    while (fscanf (file, "%s", buffer)!=EOF ) {
+        wordFIle=buffer;
+        if (regex_search(wordFIle,f)) {
+            wordFIle=regex_replace(wordFIle,f,"");
+        }
+        if (wordFIle!="") {
+                if (store.size()==0) {
+                    frequency a;
+                    a.repeat=1;
+                    porter(&wordFIle);
+                    a.word=wordFIle;
+                    store.insert(store.end(),a);
+                    added = true;
+                }
+                else {
+                    cout<<wordFIle<<endl;
+                    cout<<"ter"<<endl;
+                    porter(&wordFIle);
+                    for (int j = 0;j<store.size();j++) {
+                        if (store[j].word==wordFIle) {
+                            store[j].repeat++;
+                            added=true;
+                            break;
+                        }
+                    }
+                    if (!added) {
+                        frequency v;
+                        v.repeat=1;
+                        v.word = wordFIle;
+                        store.insert(store.end(),v);
+                    }
+                }
+        }
+        i++;
+        added=false;
+    }
+    fclose(file);
+    cout<<endl;
+    for (int j = 0;j<store.size();j++) {
+            cout<<store[j].word<<endl;
+        cout<<store[j].repeat<<endl;
+    }
+}
