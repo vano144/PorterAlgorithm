@@ -34,12 +34,12 @@ void statistic(string wordFIle,bool* added, vector<frequency>* store) { //counti
 }
 void output(vector<frequency> store) {
     for (int j = 0;j<store.size();j++) {
-        cout<<store[j].word<<endl;
+        cout<<store[j].word<<":";
         cout<<store[j].repeat<<endl;
     }
     
 }
-bool op(frequency a, frequency b) {
+bool compare(frequency a, frequency b) {
     return b.repeat > a.repeat;
 }
 int main()
@@ -65,6 +65,6 @@ int main()
     }
     fclose(file);
     cout<<endl;
-    std::sort(store.rbegin(), store.rend(),op);
+    std::sort(store.rbegin(), store.rend(),compare);
     output(store);
 }
