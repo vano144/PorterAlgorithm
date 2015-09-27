@@ -72,8 +72,10 @@ void step4(std::string* str) {
 }
 void porter(std::string* str) {
     boost::algorithm::to_lower(*str);
+    if ((str)->length()/2<=3) return;
     step1(str);
     step2(str);
     step3(str);
     step4(str);
+    
 }

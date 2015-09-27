@@ -9,22 +9,13 @@ struct frequency {
     int repeat;
     string word;
 };
-regex puncmark(",|\\.|!|\\?$"); //edit for punctuation
+regex puncmark(",|\\.|!|\\?|\\\"|…|:|-|\\(|\\)|—|\\[|\\]"); //edit for punctuation
 
 void statistic(string wordFIle,bool* added, vector<frequency>* store) { //counting frequences
     if (regex_search(wordFIle,puncmark)) {
         wordFIle=regex_replace(wordFIle,puncmark,"");
     }
-    if (wordFIle!="") {                                                 //first addition
-        if (store->size()==0) {
-            frequency a;
-            a.repeat=1;
-            porter(&wordFIle);
-            a.word=wordFIle;
-            store->insert(store->end(),a);
-            *added = true;
-        }
-        else {
+    if (wordFIle!="") {
             porter(&wordFIle);
             for (int j = 0;j<store->size();j++) {
                 if ((*store)[j].word==wordFIle) {                       //addition of old element
@@ -39,9 +30,8 @@ void statistic(string wordFIle,bool* added, vector<frequency>* store) { //counti
                 v.word = wordFIle;
                 store->insert(store->end(),v);
             }
-        }
     }
-};
+}
 void output(vector<frequency> store) {
     for (int j = 0;j<store.size();j++) {
         cout<<store[j].word<<endl;
@@ -49,9 +39,12 @@ void output(vector<frequency> store) {
     }
     
 }
+bool op(frequency a, frequency b) {
+    return b.repeat > a.repeat;
+}
 int main()
 {
-    vector<frequency>* store=new vector<frequency>(); //&
+    vector<frequency> store;
     char buffer[20];
     string wordFIle;
     FILE *file;
@@ -66,12 +59,12 @@ int main()
     }
     while (fscanf (file, "%s", buffer)!=EOF ) {
         wordFIle=buffer;
-        statistic(wordFIle, &added, store);
+        statistic(wordFIle, &added, &store);
         i++;
         added=false;
     }
     fclose(file);
     cout<<endl;
-    output(*store);
-    delete store;
+    std::sort(store.rbegin(), store.rend(),op);
+    output(store);
 }

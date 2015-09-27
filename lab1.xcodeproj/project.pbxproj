@@ -254,6 +254,7 @@
 				0162156D1BB1F601003A7A23 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
