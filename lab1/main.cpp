@@ -1,70 +1,61 @@
 #include <iostream>
 #include <stdio.h>
 #include "porter.h"
-#include <vector>
+#include <map>
 #include <regex>
+#include <string.h>
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
 using namespace std;
 
-struct frequency {
-    int repeat;
-    string word;
-};
-regex puncmark(",|\\.|!|\\?|\\\"|…|:|-|\\(|\\)|—|\\[|\\]"); //edit for punctuation
+regex puncmark(",|\\.|!|\\?|\\\"|…|:|-|\\(|\\)|—|\\[|\\]");//edit for punctuation
 
-void statistic(string wordFIle,bool* added, vector<frequency>* store) { //counting frequences
+void statistic(string wordFIle, map<string,int>* store) { //counting frequences
     if (regex_search(wordFIle,puncmark)) {
         wordFIle=regex_replace(wordFIle,puncmark,"");
     }
-    if (wordFIle!="") {
-            porter(&wordFIle);
-            for (int j = 0;j<store->size();j++) {
-                if ((*store)[j].word==wordFIle) {                       //addition of old element
-                    (*store)[j].repeat++;
-                    *added=true;
-                    break;
-                }
-            }
-            if (!(*added)) {                                            //addition of new element
-                frequency v;
-                v.repeat=1;
-                v.word = wordFIle;
-                store->insert(store->end(),v);
-            }
+    if (wordFIle=="") return;
+    porter(&wordFIle);
+    if (store->count(wordFIle)==1) {                       //addition of old element
+        (*store)[wordFIle]++;
+    }
+    else {                                            //addition of new element
+        store->insert ( pair<string,int>(wordFIle,1) );
     }
 }
-void output(vector<frequency> store) {
-    for (int j = 0;j<store.size();j++) {
-        cout<<store[j].word<<":";
-        cout<<store[j].repeat<<endl;
+
+bool compare(map<string,int>::value_type &i1, map<string,int>::value_type &i2)
+{
+    return i1.second<i2.second;
+}
+
+void outputMAP(map<string,int> store) {
+    while(store.size()!=0)
+    {
+        auto it =max_element(store.begin(), store.end(),compare);
+        cout << it->first<<" : "<<it->second<<endl;
+        store.erase(it);
     }
     
 }
-bool compare(frequency a, frequency b) {
-    return b.repeat > a.repeat;
-}
+
 int main()
 {
-    vector<frequency> store;
-    char buffer[20];
-    string wordFIle;
-    FILE *file;
-    int i = 0;
-    bool added;
-    
-    added=false;
+    map <string,int> STORE;
+    char buffer[20];                                  //TODO:vector->map
+    string wordFIle;                                       //*->&, no delete and new
+    FILE *file;                                            //punctuation,sorted map
     file = fopen("/1", "r");
     if (file==NULL) {
         cout<<"trouble"<<endl;
-        return 0;
+        return 1;
     }
     while (fscanf (file, "%s", buffer)!=EOF ) {
         wordFIle=buffer;
-        statistic(wordFIle, &added, &store);
-        i++;
-        added=false;
+        statistic(wordFIle, &STORE);
     }
     fclose(file);
     cout<<endl;
-    std::sort(store.rbegin(), store.rend(),compare);
-    output(store);
+    outputMAP(STORE);
+    return 0;
 }
